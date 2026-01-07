@@ -1,0 +1,64 @@
+name: Security Monitoring
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday at midnight
+  workflow_dispatch:
+
+jobs:
+  comprehensive-security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install security tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install bandit safety semgrep
+
+      - name: Run Bandit
+        continue-on-error: true
+        run: |
+          bandit -r . -f json -o bandit-report.json
+          bandit -r . -ll -ii
+
+      - name: Run Safety
+        continue-on-error: true
+        run: |
+          safety check --json > safety-report.json
+          safety check
+
+      - name: Run Semgrep
+        continue-on-error: true
+        run: |
+          semgrep --config=auto --json --output=semgrep-report.json .
+          semgrep --config=auto .
+
+      - name: Upload all security reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: weekly-security-reports
+          path: |
+            bandit-report.json
+            safety-report.json
+            semgrep-report.json
+
+      - name: Create GitHub Issue if vulnerabilities found
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Security vulnerabilities detected in weekly scan',
+              body: 'Automated security scan found potential issues. Check the workflow run for details.',
+              labels: ['security', 'automated']
+            })
