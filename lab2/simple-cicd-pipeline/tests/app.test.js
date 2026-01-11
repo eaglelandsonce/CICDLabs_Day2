@@ -12,7 +12,7 @@ describe('Simple App Tests', () => {
     const response = await request(app).get('/health');
     expect(response.status).toBe(200);
     expect(response.body.status).toBe('healthy');
-  });
+  });                                                                                                                                                                                                                                                                                                                                                                                                                 
 
   test('API endpoint should work', async () => {
     const response = await request(app).get('/api/hello');
