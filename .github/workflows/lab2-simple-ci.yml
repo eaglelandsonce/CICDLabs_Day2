@@ -1,4 +1,4 @@
-name: Lab2 Simple CI
+name: Lab2-Simple CI
 
 # When to run this workflow
 on:

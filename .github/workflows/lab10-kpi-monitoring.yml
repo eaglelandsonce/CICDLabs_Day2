@@ -1,4 +1,4 @@
-name: Lab10Ubuntu CI/CD KPI Monitoring
+name: Lab10-Ubuntu CI/CD KPI Monitoring
 
 on:
   schedule:

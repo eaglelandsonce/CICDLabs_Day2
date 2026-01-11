@@ -1,4 +1,4 @@
-name: LabError Handling Demo
+name: Lab3-LabError Handling Demo
 
 on:
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: Lab10Optimized CI with Advanced Caching - Ubuntu
+name: Lab10-Optimized CI with Advanced Caching - Ubuntu
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Lab10Comprehensive CI with Detailed Logging - Ubuntu
+name: Lab10-Comprehensive CI with Detailed Logging - Ubuntu
 
 on:
   push:

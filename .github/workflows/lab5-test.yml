@@ -1,4 +1,4 @@
-name: Lab5Run Tests
+name: Lab5-Run Tests
 
 on:
   push:

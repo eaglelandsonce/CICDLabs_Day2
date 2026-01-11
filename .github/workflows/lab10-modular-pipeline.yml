@@ -1,4 +1,4 @@
-name: Lab10Modular CI/CD Pipeline - Ubuntu
+name: Lab10-Modular CI/CD Pipeline - Ubuntu
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: LabDeploy to Production
+name: Lab9-Deploy to Production
 
 on:
   push:

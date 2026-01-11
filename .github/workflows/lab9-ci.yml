@@ -1,4 +1,4 @@
-name: LabCI Pipeline with Security
+name: Lab9-CI Pipeline with Security
 
 on:
   push:
