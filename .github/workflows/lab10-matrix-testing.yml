@@ -1,4 +1,4 @@
-name: Matrix Testing Strategy - Ubuntu Only
+name: Lab10-Matrix Testing Strategy - Ubuntu Only
 
 on:
   push:

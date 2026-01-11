@@ -1,4 +1,4 @@
-name: Optimized CI/CD (Small)
+name: Lab3-Optimized CI/CD (Small)
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Lab6-Build and Deploy
 
 on:
   push:

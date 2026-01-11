@@ -1,4 +1,4 @@
-name: DevOps Capstone - Deployment
+name: Lab11-DevOps Capstone - Deployment
 
 on:
   workflow_run:

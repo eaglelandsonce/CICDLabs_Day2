@@ -1,4 +1,4 @@
-name: Rollback Deployment
+name: Lab6-Rollback Deployment
 
 on:
   workflow_dispatch:

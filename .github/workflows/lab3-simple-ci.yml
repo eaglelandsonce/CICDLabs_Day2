@@ -1,4 +1,4 @@
-name: Simple CI
+name: Lab3-Simple CI
 
 # When to run this workflow _
 on:

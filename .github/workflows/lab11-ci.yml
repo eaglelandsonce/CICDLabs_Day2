@@ -1,4 +1,4 @@
-name: DevOps Capstone - Continuous Integration
+name: Lab11-DevOps Capstone - Continuous Integration
 
 on:
   push:
