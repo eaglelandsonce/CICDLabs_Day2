@@ -1,0 +1,71 @@
+name: Lab5-Run Tests (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      python-version:
+        description: 'Python version to test with'
+        required: true
+        default: '3.11'
+        type: choice
+        options:
+          - '3.9'
+          - '3.10'
+          - '3.11'
+      coverage:
+        description: 'Run with coverage report'
+        required: true
+        default: true
+        type: boolean
+      verbose:
+        description: 'Verbose test output'
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lab5/python-pytest-demo
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ inputs.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests (without coverage)
+        if: ${{ !inputs.coverage }}
+        run: |
+          PYTHONPATH=. pytest ${{ inputs.verbose && '-v' || '' }}
+
+      - name: Run tests with coverage
+        if: ${{ inputs.coverage }}
+        run: |
+          PYTHONPATH=. pytest --cov=math_utils --cov=string_utils --cov-report=term --cov-report=html ${{ inputs.verbose && '-v' || '' }}
+
+      - name: Upload coverage report
+        if: ${{ inputs.coverage }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report-python-${{ inputs.python-version }}
+          path: lab5/python-pytest-demo/htmlcov/
+          retention-days: 7
+
+      - name: Display test summary
+        if: always()
+        run: |
+          echo "## Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Python Version: ${{ inputs.python-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Coverage Enabled: ${{ inputs.coverage }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Verbose Output: ${{ inputs.verbose }}" >> $GITHUB_STEP_SUMMARY
