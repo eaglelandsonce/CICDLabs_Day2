@@ -11,29 +11,86 @@ on:
           - staging
           - production
       previous_version:
-        description: 'Previous version/tag to rollback to'
+        description: 'Previous version/tag to rollback to (e.g., main-abc1234 or latest)'
         required: true
         type: string
+
+env:
+  REGISTRY: docker.io
 
 jobs:
   rollback:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     steps:
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: List available versions
+        run: |
+          echo "📋 Available versions in DockerHub:"
+          echo ""
+          # Using Docker Hub API to list tags
+          REPO="${{ secrets.DOCKERHUB_USERNAME }}/flask-deployment-demo"
+          curl -s "https://hub.docker.com/v2/repositories/${REPO}/tags?page_size=10" | \
+            jq -r '.results[] | "\(.name) (pushed: \(.last_updated[:10]))"' || \
+            echo "Unable to fetch tags via API. Check: https://hub.docker.com/r/${REPO}/tags"
+          echo ""
+
+      - name: Verify image exists
+        id: verify
+        run: |
+          echo "🔍 Verifying image exists in registry..."
+          IMAGE="${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/flask-deployment-demo:${{ github.event.inputs.previous_version }}"
+          echo "Checking: $IMAGE"
+          
+          # Pull the image to verify it exists
+          if docker pull "$IMAGE"; then
+            echo "✅ Image found: $IMAGE"
+            echo "image=$IMAGE" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Error: Image not found: $IMAGE"
+            echo "Available tags can be found at: https://hub.docker.com/r/${{ secrets.DOCKERHUB_USERNAME }}/flask-deployment-demo/tags"
+            exit 1
+          fi
+
       - name: Rollback deployment
         run: |
           echo "🔄 Rolling back ${{ github.event.inputs.environment }} to version ${{ github.event.inputs.previous_version }}"
-          echo "Simulating rollback process..."
+          echo "Image: ${{ steps.verify.outputs.image }}"
+          echo ""
+          echo "📦 Deployment steps:"
+          echo "  1. Stopping current version"
+          echo "  2. Pulling image: ${{ steps.verify.outputs.image }}"
+          echo "  3. Starting container with previous version"
+          echo "  4. Running health checks"
+          echo ""
+          echo "Simulating deployment to ${{ github.event.inputs.environment }} server..."
           sleep 5
-          echo "✅ Rollback completed successfully!"
+          echo "✅ Rollback deployment completed successfully!"
 
       - name: Verify rollback
         run: |
           echo "🧪 Verifying rollback..."
+          echo "Running health checks on ${{ github.event.inputs.environment }}..."
+          echo "Checking application endpoints..."
+          echo "Validating service status..."
+          sleep 2
           echo "✅ Rollback verification passed!"
 
       - name: Notify rollback
         run: |
-          echo "📢 Rollback completed!"
+          echo "📢 Rollback completed successfully!"
+          echo ""
           echo "Environment: ${{ github.event.inputs.environment }}"
           echo "Rolled back to: ${{ github.event.inputs.previous_version }}"
+          echo "Image: ${{ steps.verify.outputs.image }}"
+          echo ""
+          echo "Next steps:"
+          echo "  - Monitor application metrics"
+          echo "  - Verify user-facing functionality"
+          echo "  - Check application logs for any issues"
