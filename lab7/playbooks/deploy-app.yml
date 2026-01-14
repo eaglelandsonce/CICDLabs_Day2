@@ -129,29 +129,35 @@
         name: supervisor
         state: started
         enabled: yes
+      when: not ansible_check_mode
 
     - name: Reread Supervisor configs
       command: supervisorctl reread
+      when: not ansible_check_mode
 
     - name: Update Supervisor with new configs
       command: supervisorctl update
+      when: not ansible_check_mode
 
     - name: Start application
       supervisorctl:
         name: "{{ app_name }}"
         state: started
+      when: not ansible_check_mode
 
     - name: Wait for application to be ready
       wait_for:
         port: "{{ app_port }}"
         host: "{{ ansible_host }}"
         timeout: 30
+      when: not ansible_check_mode
 
     - name: Test application health endpoint
       uri:
         url: "http://{{ ansible_host }}:{{ app_port }}/health"
         method: GET
         status_code: 200
+      when: not ansible_check_mode
 
     - name: Display deployment summary
       debug:
